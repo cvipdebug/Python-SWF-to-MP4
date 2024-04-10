@@ -6,11 +6,13 @@ def main():
     parser = argparse.ArgumentParser(description='Convert SWF to MP4')
     parser.add_argument('-i', '--input', type=str, help='Input SWF file', required=True)
     parser.add_argument('-o', '--output', type=str, help='Output MP4 file', required=True)
+    parser.add_argument('-f', '--fps', type=int, help='Frame rate for the output video', default=30)
 
     args = parser.parse_args()
 
     swf_file = args.input
     final_video_file = args.output
+    fps = args.fps
 
     audio_file = "out.mp3"
     image_folder = "images"
@@ -28,11 +30,11 @@ def main():
         os.makedirs(image_folder)
 
     # Convert SWF to images using ffmpeg
-    ffmpeg_command = f'ffmpeg -i {swf_file} -vf "fps=30" {image_folder}/%d.png'
+    ffmpeg_command = f'ffmpeg -i {swf_file} -vf "fps={fps}" {image_folder}/%d.png'
     subprocess.run(ffmpeg_command, shell=True, check=True)
 
     # Convert images to MP4 using ffmpeg
-    ffmpeg_command = f'ffmpeg -framerate 30 -i {image_folder}/%d.png -c:v libx264 -pix_fmt yuv420p {mp4_file}'
+    ffmpeg_command = f'ffmpeg -framerate {fps} -i {image_folder}/%d.png -c:v libx264 -pix_fmt yuv420p {mp4_file}'
     subprocess.run(ffmpeg_command, shell=True, check=True)
 
     # Combine MP3 audio with MP4 video using ffmpeg
